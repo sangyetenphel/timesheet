@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}
+  Weeks
+{% endblock %}
+
+{% block main %}
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Day</th>
+      <th scope="col">Start Time</th>
+      <th scope="col">End Time</th>
+      <th scope="col">Pay</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Monday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+    <tr>
+      <th scope="row">Tuesday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+    <tr>
+      <th scope="row">Wednesday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+    <tr>
+      <th scope="row">Thursday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+    <tr>
+      <th scope="row">Friday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+    <tr>
+      <th scope="row">Saturday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+    <tr>
+      <th scope="row">Sunday</th>
+      <td><input type="time"></td>
+      <td><input type="time"></td>
+      <td>$15</td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3"></td>
+      <th>$200</th>
+    </tr>
+  </tfoot>
+</table>
+{% endblock %}
