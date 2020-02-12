@@ -12,11 +12,12 @@
             "env": {
                 "FLASK_APP": "app.py",
                 "FLASK_ENV": "development",
-                "FLASK_DEBUG": "1"
+                "FLASK_DEBUG": "0"
             },
             "args": [
                 "run",
-                "--no-debugger"
+                "--no--debugger",
+                "--no-reload"
             ],
             "jinja": true
         }

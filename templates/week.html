@@ -5,64 +5,52 @@
 {% endblock %}
 
 {% block main %}
-<table class="table">
-  <thead>
-    <tr>
-      <th scope="col">Day</th>
-      <th scope="col">Start Time</th>
-      <th scope="col">End Time</th>
-      <th scope="col">Pay</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">Monday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-    <tr>
-      <th scope="row">Tuesday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-    <tr>
-      <th scope="row">Wednesday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-    <tr>
-      <th scope="row">Thursday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-    <tr>
-      <th scope="row">Friday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-    <tr>
-      <th scope="row">Saturday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-    <tr>
-      <th scope="row">Sunday</th>
-      <td><input type="time"></td>
-      <td><input type="time"></td>
-      <td>$15</td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td colspan="3"></td>
-      <th>$200</th>
-    </tr>
-  </tfoot>
-</table>
+<div>
+  <h4>Workplace: {{ company[2] }}</h4>
+  <h4>Basepay: ${{ company[3] }}</h4>
+</div>
+
+<hr>
+
+<div class="no-padding">
+  <form action="/week/{{cname}}" method="post" id="myForm"></form>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">Day</th>
+        <th scope="col">Start Time</th>
+        <th scope="col">End Time</th>
+        <th scope="col">Pay</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for week in weeks %}
+        <tr>
+          <th>{{ week[0]|day }}</th>
+          <td><input name="start" class="start" type="time" form="myForm" value="{{ week[1] }}"></td>
+          <td><input name="end" class="end" type="time" form="myForm" value="{{ week[2] }}" onchange="myFunction(this)"></td>
+          <td>${{ week[3] }}</td>
+        </tr>
+      {% endfor%}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"></td>
+        <th>${{ total }}</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+
+<script>
+  function myFunction(e){
+    // When a user changes his time wait till user leaves the input then only submit form
+    e.onblur = function(){
+      if (e.value != ""){
+        document.getElementById("myForm").submit();
+      }
+    }
+  }
+</script>
 {% endblock %}

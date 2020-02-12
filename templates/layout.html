@@ -19,12 +19,27 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbar">
-            <ul class="navbar-nav ml-auto mt-2">
-                <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-                <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
-            </ul>
+          {% if session.user_id %}
+          <ul class="navbar-nav ml-auto mt-2">
+            <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+          </ul>
+          {% else %}
+          <ul class="navbar-nav ml-auto mt-2">
+            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+            <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+          </ul>
+          {% endif %}
         </div>
       </nav>
+
+      {% if get_flashed_messages() %}
+        <header>
+          <div class="alert alert-primary border text-center" role="alert">
+            <!-- using jinja's join() to convert the flashed message list into a string-->
+            {{ get_flashed_messages() | join(" ")}}
+          </div>
+        </header>
+      {% endif%}
 
       <main class="container p-5">
         {% block main %}

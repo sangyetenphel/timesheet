@@ -6,3 +6,15 @@ main
     /* center contents */
     text-align: center;
 }
+
+main img
+{
+    /* constrain images on small screens */
+    max-width: 100%;
+}
+
+.no-padding{
+    /* (top, right, bottom, and left) */
+    margin:  0 -50px 0 -50px;
+}
+
