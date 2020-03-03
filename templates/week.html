@@ -5,45 +5,69 @@
 {% endblock %}
 
 {% block main %}
-<div>
+<div class="go-back">
+  <a href="/">Go Back</a>
+</div>
+
+<div class="col-xl-5 col-lg-6 col-md-8 col-sm-10 mx-auto text-center form p-4">
   <h4>Workplace: {{ company[2] }}</h4>
   <h4>Basepay: ${{ company[3] }}</h4>
+  <h4>{{ date_range[0] }} - {{ date_range[1]}}</h4>
+  <div class="px-2">
+      <form action="/week/{{cname}}" method="post" id="dateForm" class="justify-content-center">
+          <div class="form-group">
+              <label class="sr-only">Filter Date</label>
+              <input type="date" class="form-control" min="2020-01-01" max="2020-12-30" id="filter-date" name="filter-date">
+          </div>
+          <button type="button" class="btn btn-primary" onclick="filterDate()">Filter Date</button>
+      </form>
+  </div>
 </div>
 
-<hr>
-
-<div class="no-padding">
-  <form action="/week/{{cname}}" method="post" id="myForm"></form>
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">Day</th>
-        <th scope="col">Start Time</th>
-        <th scope="col">End Time</th>
-        <th scope="col">Pay</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for week in weeks %}
+<div class="container p-5"> 
+  <div class="no-padding">
+    <form action="/week/{{cname}}" method="post" id="myForm"></form>
+    <table class="table">
+      <thead>
         <tr>
-          <th>{{ week[0]|day }}</th>
-          <td><input name="start" class="start" type="time" form="myForm" value="{{ week[1] }}"></td>
-          <td><input name="end" class="end" type="time" form="myForm" value="{{ week[2] }}" onchange="myFunction(this)"></td>
-          <td>${{ week[3] }}</td>
+          <th scope="col">Day</th>
+          <th scope="col">Start Time</th>
+          <th scope="col">End Time</th>
+          <th scope="col">Pay</th>
         </tr>
-      {% endfor%}
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="3"></td>
-        <th>${{ total }}</th>
-      </tr>
-    </tfoot>
-  </table>
+      </thead>
+      <tbody>
+        {% for week in weeks %}
+          <tr>
+            <th>{{ week[0]|day }}</th>
+            <td><input class="form-control" name="start" class="start" type="time" form="myForm" value="{{ week[1] }}"></td>
+            <td><input class="form-control" name="end" class="end" type="time" form="myForm" value="{{ week[2] }}" onchange="myFunction(this)"></td>
+            <td>${{ week[3] }}</td>
+          </tr>
+        {% endfor%}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3"></td>
+          <th>${{ total }}</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 </div>
-
 
 <script>
+  function filterDate(){
+    let filteredDate= document.querySelector("#filter-date");
+    if (!filteredDate.value) {
+      alert("Date not provded!");
+      return false;
+    } else {
+      document.getElementById("dateForm").submit();
+    }
+  }
+
+
   function myFunction(e){
     // When a user changes his time wait till user leaves the input then only submit form
     e.onblur = function(){

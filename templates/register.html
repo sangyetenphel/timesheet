@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block main %}
+<div class="container p-5">
+    <p>Create a free account to start tracking your time.</p>
     <form id="register" action="/register" method="post">
         <div class="form-group">
             <input id="username" autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" required>
@@ -17,4 +19,6 @@
         </div>
         <button id= "registerForm" class="btn btn-primary" type="submit" onclick=checkUsername()>Register</button>
     </form>
+</div> 
+<p>&copy;Timesheet by Sangye Tenphel</p>
 {% endblock %}

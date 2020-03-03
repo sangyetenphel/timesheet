@@ -91,7 +91,11 @@ def index():
 
     # fetchall() to get all the rows returned instead of fetchone 
     rows = c.fetchall()
-    return render_template("index.html", companies=rows)
+
+    # list of colors for different workplaces
+    colors = ['#0074D9','#FF4136','#3D9970','#FF851B','#39CCCC','85144b','#F012BE','#AAAAA','#01FF70','#001f3f']
+
+    return render_template("index.html", companies=rows, colors=colors)
 
 
 # Accessing a variable url via <>
@@ -100,14 +104,25 @@ def index():
 def week(cname):
     """Let user note down hours worked"""
 
-    today = datetime.now().date()
+    # if user provides a filter date
+    filter_date = request.form.get("filter-date")
+
+    if filter_date == None:
+        today = datetime.now().date()
+    else:
+        # converting str into datetime object
+        today = datetime.strptime(filter_date, '%Y-%m-%d')
+
     start_day = today - timedelta(days=today.weekday())
     end_day = start_day + timedelta(days=6)
     delta = timedelta(days=1)
 
-    #lock the cursor
+    # Date range to pass in html
+    date_range = start_day.strftime('%b %d'), end_day.strftime('%b %d')
+    
+    # Lock the cursor
     lock.acquire(True)
-    # # Get a tuple of the company's data user just clicked
+    # Get a tuple of the company's data user just clicked
     c.execute("SELECT * FROM company WHERE company_name = :cname AND user_id = :user_id",
               {"cname": cname, "user_id": session.get('user_id')})
     company = c.fetchone()
@@ -117,6 +132,7 @@ def week(cname):
      # Get the start time, end time & pay of a week starting from the start day till the weeks end
     c.execute("SELECT start, end, pay FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day, end_day))
     hours = c.fetchall()
+
 
     # Store the week in a list
     weeks = []
@@ -129,29 +145,34 @@ def week(cname):
     for i in range(len(hours)):
         weeks[i] += hours[i] 
 
-
     if request.method == "POST":
         # Get a list of user input for start and end time
         start = request.form.getlist('start')
         end = request.form.getlist('end')
+        
+        # If POST request came from the filter date 
+        if start == [] and end == []:
+            c.execute("SELECT SUM(pay) FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day, end_day))
+            total = c.fetchone()[0]
+            return render_template("week.html", weeks=weeks, cname=cname, company=company, total=total, date_range=date_range)
+        else:
+            for i in range(7):
+                # Check if the weeks data is already in the db for that user and company
+                lock.acquire(True)
+                c.execute("SELECT end FROM work_hours WHERE date=:date AND user_id=:user_id AND company_id=:company_id", {'date':weeks[i][0], 'user_id':session.get('user_id'), 'company_id':company[0]})
+                rows = c.fetchone()
+                lock.release()
 
-        for i in range(7):
-            # Check if the weeks data is already in the db for that user and company
-            lock.acquire(True)
-            c.execute("SELECT end FROM work_hours WHERE date=:date AND user_id=:user_id AND company_id=:company_id", {'date':weeks[i][0], 'user_id':session.get('user_id'), 'company_id':company[0]})
-            rows = c.fetchone()
-            lock.release()
-            
-            
-            # Calculating pay of each day
-            fmt = "%H:%M"
-            if start[i] != "" and end[i] != "":
-                # hours_worked.append(datetime.strptime(end[i], fmt) - datetime.strptime(start[i], fmt))
-                # pay = hours_worked[i].seconds * (company[3]/3600)
-                pay = (datetime.strptime(end[i], fmt) - datetime.strptime(start[i], fmt)).seconds * (company[3]/3600)
+                # Calculating pay of each day
+                fmt = "%H:%M"
+                if start[i] != "" and end[i] != "":
+                    # hours_worked.append(datetime.strptime(end[i], fmt) - datetime.strptime(start[i], fmt))
+                    # pay = hours_worked[i].seconds * (company[3]/3600)
+                    pay = (datetime.strptime(end[i], fmt) - datetime.strptime(start[i], fmt)).seconds * (company[3]/3600)
+                else:
+                    pay = 0
 
                 # If the weeks data doesnot exist in the db
-
                 if rows == None:
                     lock.acquire(True)
                     c.execute("INSERT INTO work_hours (user_id, company_id, date, start, end, pay) VALUES (?, ?, ?, ?, ?, ?)", (session.get('user_id'), company[0], weeks[i][0], start[i], end[i], pay))
@@ -164,7 +185,8 @@ def week(cname):
                     c.execute("UPDATE work_hours SET start=?, end=?, pay=? WHERE user_id=? AND company_id=? AND date=?",
                             (start[i], end[i], pay, session.get("user_id"), company[0], weeks[i][0]))
                     connection.commit()
-                    lock.release()  
+                    lock.release() 
+        
 
         return redirect(url_for('week', cname=cname))
     else:
@@ -172,7 +194,7 @@ def week(cname):
         # Fetch the total pay of a week
         c.execute("SELECT SUM(pay) FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day, end_day))
         total = c.fetchone()[0]
-        return render_template("week.html", weeks=weeks, cname=cname, company=company, total=total)
+        return render_template("week.html", weeks=weeks, cname=cname, company=company, total=total,date_range=date_range)
 
 
 @app.route("/login", methods=["GET","POST"])
