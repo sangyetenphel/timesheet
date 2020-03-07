@@ -1,5 +1,3 @@
-# connection commit and close when??
-
 from flask import Flask, render_template, request, redirect, flash, session, url_for
 from flask_session import Session
 from helpers import apology, login_required, day
