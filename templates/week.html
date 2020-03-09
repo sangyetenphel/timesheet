@@ -10,6 +10,7 @@
   <h4>Workplace: {{ company[2] }}</h4>
   <h4>Basepay: ${{ company[3] }}</h4>
   <h4>{{ date_range[0] }} - {{ date_range[1]}}</h4>
+  
   <div class="px-2">
       <form action="/week/{{cname}}" method="post" id="dateForm" class="justify-content-center">
           <div class="form-group">
@@ -36,9 +37,10 @@
       <tbody>
         {% for week in weeks %}
           <tr>
-            <th>{{ week[0]|day }}</th>
-            <td><input class="form-control" name="start" class="start" type="time" form="myForm" value="{{ week[1] }}"></td>
-            <td><input class="form-control" name="end" class="end" type="time" form="myForm" value="{{ week[2] }}" onchange="myFunction(this)"></td>
+            <th name="day">{{ week[0]|day }}</th>
+            <input type="hidden" name="date" value="{{date_range[0]}}">
+            <td><input class="form-control" name="start" class="start" type="time" form="myForm" value="{{ week[1] }}" {{ disabled }}></td>
+            <td><input class="form-control" name="end" class="end" type="time" form="myForm" value="{{ week[2] }}" onchange="myFunction(this)" {{ disabled }}></td>
             <td>${{ week[3] }}</td>
           </tr>
         {% endfor%}

@@ -111,6 +111,9 @@ def week(cname):
         # converting str into datetime object
         today = datetime.strptime(filter_date, '%Y-%m-%d')
 
+    day = request.form.getlist('date')
+    print(day)
+
     start_day = today - timedelta(days=today.weekday())
     end_day = start_day + timedelta(days=6)
     delta = timedelta(days=1)
@@ -126,9 +129,10 @@ def week(cname):
     company = c.fetchone()
     # Release the cursor
     lock.release()
+
     
-     # Get the start time, end time & pay of a week starting from the start day till the weeks end
-    c.execute("SELECT start, end, pay FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day, end_day))
+    # Get the start time, end time & pay of a week starting from the start day till the weeks end
+    c.execute("SELECT start, end, pay FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day.strftime('%Y-%m-%d'), end_day.strftime('%Y-%m-%d')))
     hours = c.fetchall()
 
 
@@ -150,9 +154,25 @@ def week(cname):
         
         # If POST request came from the filter date 
         if start == [] and end == []:
+            # if its not the current date your editing then diable it 
+            today = datetime.now().date()
+            start_day = today - timedelta(days=today.weekday())
+            end_day = start_day + timedelta(days=6)
+            delta = timedelta(days=1)
+
+            while start_day <= end_day:
+                if filter_date == start_day.strftime("%Y-%m-%d"):
+                    print(filter_date)
+                    print(start_day.strftime("%Y-%m-%d"))
+                    print('hi')
+                    disabled = False
+                    break
+                start_day += delta
+                disabled = "disabled"
+
             c.execute("SELECT SUM(pay) FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day, end_day))
             total = c.fetchone()[0]
-            return render_template("week.html", weeks=weeks, cname=cname, company=company, total=total, date_range=date_range)
+            return render_template("week.html", weeks=weeks, cname=cname, company=company, total=total, date_range=date_range, disabled=disabled)
         else:
             for i in range(7):
                 # Check if the weeks data is already in the db for that user and company
