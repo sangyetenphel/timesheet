@@ -111,10 +111,9 @@ def week(cname):
         # converting str into datetime object
         today = datetime.strptime(filter_date, '%Y-%m-%d')
 
-    day = request.form.getlist('date')
-    print(day)
-
     start_day = today - timedelta(days=today.weekday())
+    # cause we need the original startday later for fetching data from db as we are incrementing the value
+    start_day_backup = start_day
     end_day = start_day + timedelta(days=6)
     delta = timedelta(days=1)
 
@@ -156,22 +155,26 @@ def week(cname):
         if start == [] and end == []:
             # if its not the current date your editing then diable it 
             today = datetime.now().date()
-            start_day = today - timedelta(days=today.weekday())
-            end_day = start_day + timedelta(days=6)
+            filter_start = today - timedelta(days=today.weekday())
+            filter_end = filter_start + timedelta(days=6)
             delta = timedelta(days=1)
 
-            while start_day <= end_day:
-                if filter_date == start_day.strftime("%Y-%m-%d"):
-                    print(filter_date)
-                    print(start_day.strftime("%Y-%m-%d"))
-                    print('hi')
+            while filter_start <= filter_end:
+                if filter_date == filter_start.strftime("%Y-%m-%d"):
                     disabled = False
                     break
-                start_day += delta
+                filter_start += delta
                 disabled = "disabled"
 
-            c.execute("SELECT SUM(pay) FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day, end_day))
+            c.execute("SELECT SUM(pay) FROM work_hours WHERE user_id=? AND company_id=? AND date BETWEEN ? AND ?", (session.get('user_id'), company[0], start_day_backup.strftime('%Y-%m-%d'), end_day.strftime('%Y-%m-%d')))
             total = c.fetchone()[0]
+
+            print(session.get('user_id'))
+            print(company[0])
+            print(start_day.strftime('%Y-%m-%d'))
+            print(end_day.strftime('%Y-%m-%d'))
+
+
             return render_template("week.html", weeks=weeks, cname=cname, company=company, total=total, date_range=date_range, disabled=disabled)
         else:
             for i in range(7):

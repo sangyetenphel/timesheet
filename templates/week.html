@@ -38,7 +38,6 @@
         {% for week in weeks %}
           <tr>
             <th name="day">{{ week[0]|day }}</th>
-            <input type="hidden" name="date" value="{{date_range[0]}}">
             <td><input class="form-control" name="start" class="start" type="time" form="myForm" value="{{ week[1] }}" {{ disabled }}></td>
             <td><input class="form-control" name="end" class="end" type="time" form="myForm" value="{{ week[2] }}" onchange="myFunction(this)" {{ disabled }}></td>
             <td>${{ week[3] }}</td>
